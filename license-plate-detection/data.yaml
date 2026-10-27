@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 1
+names: ['License Plate']
+
+roboflow:
+  workspace: rayans-lab
+  project: license-plate-detection-9vgdz
+  version: 11
+  license: MIT
+  url: https://universe.roboflow.com/rayans-lab/license-plate-detection-9vgdz/dataset/11
