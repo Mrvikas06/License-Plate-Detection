@@ -1,0 +1,82 @@
+# ==========================================
+# Byte-compiled / optimized / DLL files
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.dylib
+
+# ==========================================
+# Virtual Environments
+# ==========================================
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ==========================================
+# YOLO / Ultralytics Runtimes & Caches
+# ==========================================
+*.cache
+labels.cache
+runs/predict/
+runs/predict*/
+runs/eval/
+runs/eval*/
+runs/val/
+runs/val*/
+
+# Ultralytics auto-downloaded assets
+*.pt.download
+*.tmp
+*.temp
+
+# Experiment Tracking (W&B, TensorBoard, MLflow)
+wandb/
+runs/**/events.out.tfevents.*
+.tensorboard/
+mlruns/
+
+# ==========================================
+# Large Dataset Images & Training Runs
+# ==========================================
+license-plate-detection/train/
+license-plate-detection/valid/
+license-plate-detection/test/
+license-plate-detection/runs/
+license-plate-detection/weights/
+license-plate-detection/*.pt
+
+# ==========================================
+# IDE & Editor Configurations
+# ==========================================
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# ==========================================
+# Operating System Artifacts
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ==========================================
+# Logs & Testing
+# ==========================================
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
