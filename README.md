@@ -180,7 +180,7 @@ ai train/
 
 ---
 
-## 🗄 Dataset Architecture
+##  Dataset Architecture
 
 The dataset is structured following standard YOLO darknet format and sourced from Roboflow Universe (`rayans-lab/license-plate-detection-9vgdz/11`):
 
@@ -206,7 +206,7 @@ names: ['License Plate']
 
 ---
 
-## 🚀 Quick Start Guide
+##  Quick Start Guide
 
 ### Step 1: Installation & Environment Setup
 
@@ -297,7 +297,7 @@ python export.py --format onnx --simplify
 
 ---
 
-## ⚡ Hardware & Speed Profile
+##  Hardware & Speed Profile
 
 Benchmarked on **NVIDIA GeForce RTX 3050 6GB Laptop GPU**:
 
