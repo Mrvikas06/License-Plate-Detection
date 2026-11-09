@@ -98,3 +98,123 @@ The model was trained for 50 epochs on an NVIDIA RTX 3050 GPU using SGD with mom
 - **DFL Loss**: Steady convergence from `1.307` $\rightarrow$ `1.084` (Train) and `1.330` $\rightarrow$ `1.181` (Val).
 
 ![Training Progress and Metrics](assets/training_results.png)
+*Figure 2: Comprehensive 50-epoch training and validation loss curves, Precision, Recall, and mAP trajectories.*
+
+---
+
+### 4. Diagnostic Curves (PR, F1, Confusion Matrix)
+
+#### A. Normalized Confusion Matrix
+Confirms clean separation between vehicle license plates and complex background textures (road surfaces, grilles, bumper reflections):
+
+<p align="center">
+  <img src="assets/test_confusion_matrix.png" alt="Normalized Confusion Matrix" width="600" />
+</p>
+
+#### B. Precision-Recall (PR) Curve & F1-Confidence Curve
+- **PR Curve**: Exhibits a high Area Under Curve (AUC) across all recall levels, achieving **0.899 mAP@0.50**.
+- **F1 Curve**: Reaches peak harmonic mean across a wide confidence interval ($conf \approx 0.35 - 0.65$), allowing flexible operating thresholds.
+
+| Precision-Recall Curve ($AUC = 0.899$) | F1-Confidence Curve |
+| :---: | :---: |
+| ![Test PR Curve](assets/test_pr_curve.png) | ![Test F1 Curve](assets/test_f1_curve.png) |
+
+---
+
+### 5. Visual Detections on Unseen Test Data
+
+The model demonstrates strong robustness against challenging angles, multi-vehicle scenes, and long-range perspectives:
+
+| Angle View Perspective | Multi-Vehicle Urban Scene |
+| :---: | :---: |
+| ![Detection 1](assets/proof/sample_detection_1.jpg) | ![Detection 2](assets/proof/sample_detection_3.jpg) |
+
+#### Full Test Batch Prediction Grid
+![Test Batch Predictions](assets/test_batch_predictions.jpg)
+*Figure 3: Representative test evaluation batch displaying predicted bounding boxes, labels, and confidence probabilities.*
+
+---
+
+### 6. Automated License Plate Cropping
+
+The built-in inference pipeline isolates detected plates, cropping and saving them at original resolution for downstream OCR:
+
+| Plate Crop Sample 1 (`conf: 0.85`) | Plate Crop Sample 2 (`conf: 0.76`) | Plate Crop Sample 3 (`conf: 0.72`) |
+| :---: | :---: | :---: |
+| ![Crop 1](assets/proof/crop_sample_1.jpg) | ![Crop 2](assets/proof/crop_sample_2.jpg) | ![Crop 3](assets/proof/crop_sample_3.jpg) |
+
+---
+
+## 📁 Repository Structure
+
+```
+ai train/
+├── assets/                               # Evaluation plots & proof media
+│   ├── web_demo_proof.png                # Verified localhost browser UI screenshot
+│   ├── training_results.png              # 50-epoch loss and mAP progression plots
+│   ├── test_pr_curve.png                 # Precision-Recall curve
+│   ├── test_f1_curve.png                 # F1-Score vs Confidence curve
+│   ├── test_confusion_matrix.png         # Normalized test confusion matrix
+│   ├── test_batch_predictions.jpg        # Unseen test batch detections
+│   └── proof/                            # Sample detection and crop images
+├── weights/                              # Production and base model checkpoints
+│   ├── best.pt                           # Primary fine-tuned YOLO11 model (5.4 MB)
+│   ├── last.pt                           # Epoch 50 checkpoint (5.4 MB)
+│   ├── best.torchscript                  # Exported TorchScript model (10.8 MB)
+│   └── yolo11n.pt                        # Base pretrained YOLO11 nano model
+├── license-plate-detection/              # Full dataset & Roboflow source
+│   ├── train/ (images, labels)           # 10,812 training samples
+│   ├── valid/ (images, labels)           # 2,593 validation samples
+│   └── test/  (images, labels)           # 2,597 held-out test samples
+├── app.py                                # Zero-dependency browser web dashboard
+├── predict.py                            # Production inference CLI (image/video/webcam)
+├── val.py                                # Model validation and benchmarking script
+├── train.py                              # Reproducible training pipeline
+├── export.py                             # Edge runtime exporter (TorchScript/ONNX)
+├── dataset.yaml                          # Clean root dataset configuration
+├── requirements.txt                      # Pinned Python dependencies
+├── .gitignore                            # Version control exclusion rules
+├── LICENSE                               # MIT License
+└── README.md                             # Comprehensive project documentation
+```
+
+---
+
+## 🗄 Dataset Architecture
+
+The dataset is structured following standard YOLO darknet format and sourced from Roboflow Universe (`rayans-lab/license-plate-detection-9vgdz/11`):
+
+```
+Dataset Distribution:
+├── Train Set:  10,812 images (67.6%)  -> Parameter optimization
+├── Valid Set:   2,593 images (16.2%)  -> Validation & early stopping
+└── Test Set:    2,597 images (16.2%)  -> Unseen held-out benchmark
+    ────────────────────────────────
+    Total:      16,002 images
+```
+
+Dataset configuration (`dataset.yaml`):
+```yaml
+path: license-plate-detection
+train: train/images
+val: valid/images
+test: test/images
+
+nc: 1
+names: ['License Plate']
+```
+
+---
+
+## 🚀 Quick Start Guide
+
+### Step 1: Installation & Environment Setup
+
+Clone the repository and set up a Python virtual environment (Python 3.10+ recommended):
+
+```bash
+# Clone the repository
+git clone <repo-url>
+cd "ai train"
+
+# Create and activate virtual environment
