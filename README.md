@@ -218,3 +218,129 @@ git clone <repo-url>
 cd "ai train"
 
 # Create and activate virtual environment
+python -m venv venv
+.\venv\Scripts\activate      # Windows PowerShell / CMD
+# source venv/bin/activate   # Linux / macOS
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+---
+
+### Step 2: Interactive Web Studio
+
+Launch the zero-dependency browser interface powered by Python's built-in HTTP server:
+
+```bash
+python app.py
+```
+Open **[http://localhost:8000](http://localhost:8000)** to drag-and-drop vehicle images, tune detection confidence interactively, and view instant bounding boxes with cropped plates.
+
+---
+
+### Step 3: Command-Line Inference
+
+Run detection on single images, directories, video files, or live cameras using `predict.py`:
+
+```bash
+# Detect on a single image and save cropped plate chips:
+python predict.py --source "license-plate-detection/test/images/sample.jpg" --save-crop
+
+# Run batch detection on a folder:
+python predict.py --source "license-plate-detection/test/images" --conf 0.40
+
+# Process a video file:
+python predict.py --source "traffic_stream.mp4" --save
+
+# Live webcam stream (0 for default camera):
+python predict.py --source 0 --show
+```
+
+---
+
+### Step 4: Model Validation & Benchmarking
+
+Replicate the official evaluation metrics on either the test or validation splits:
+
+```bash
+# Benchmark on the 2,597 unseen TEST images:
+python val.py --split test --batch 16
+
+# Benchmark on the VALIDATION split:
+python val.py --split val --batch 16
+```
+
+---
+
+### Step 5: Training Pipeline
+
+Train from scratch or fine-tune with custom hyperparameters:
+
+```bash
+python train.py --epochs 50 --batch 8 --imgsz 640 --device 0
+```
+
+---
+
+### Step 6: Model Export (TorchScript / ONNX)
+
+Export the trained PyTorch weights for edge devices, C++ runtimes, or mobile deployment:
+
+```bash
+# Export to TorchScript (Production C++ / PyTorch mobile)
+python export.py --format torchscript
+
+# Export to ONNX (OpenVINO / TensorRT / ONNX Runtime)
+python export.py --format onnx --simplify
+```
+
+---
+
+## ⚡ Hardware & Speed Profile
+
+Benchmarked on **NVIDIA GeForce RTX 3050 6GB Laptop GPU**:
+
+| Processing Stage | Latency (ms) | Notes |
+| :--- | :---: | :--- |
+| **Image Preprocessing** | `1.4 ms` | Letterbox resizing to $640 \times 640$, FP32 conversion |
+| **Model Forward Pass** | `5.4 ms` | YOLO11 Nano GPU inference |
+| **NMS Postprocessing** | `0.9 ms` | Non-Maximum Suppression at $IoU = 0.45$ |
+| **Total Latency** | **`7.7 ms`** | **~130 FPS sustained real-time throughput** |
+
+---
+
+## 🔗 Downstream ANPR Integration (OCR)
+
+This detector outputs cropped plate images directly. To implement complete **Automatic Number Plate Recognition (ANPR)**, pair the crops with an OCR engine:
+
+```python
+import cv2
+import easyocr
+from ultralytics import YOLO
+
+# 1. Load YOLO11 detector and OCR engine
+detector = YOLO("weights/best.pt")
+reader = easyocr.Reader(['en'], gpu=True)
+
+# 2. Run plate detection
+img = cv2.imread("vehicle.jpg")
+results = detector.predict(img, conf=0.35)
+
+# 3. Crop and transcribe plate text
+for box in results[0].boxes:
+    x1, y1, x2, y2 = box.xyxy[0].cpu().numpy().astype(int)
+    plate_crop = img[y1:y2, x1:x2]
+
+    ocr_results = reader.readtext(plate_crop)
+    for (_, text, prob) in ocr_results:
+        print(f"Recognized Plate: {text.upper()} (Confidence: {prob:.2f})")
+```
+
+---
+
+## 📜 License & Acknowledgments
+
+- **Model & Code**: Licensed under the **[MIT License](LICENSE)**.
+- **Base Architecture**: Built using the [Ultralytics](https://github.com/ultralytics/ultralytics) framework.
+- **Dataset**: License Plate Detection Dataset hosted on [Roboflow Universe](https://universe.roboflow.com/rayans-lab/license-plate-detection-9vgdz/dataset/11).
